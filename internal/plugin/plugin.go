@@ -7,6 +7,7 @@ import (
 
 	"github.com/git-fal7/friend-for-gate/internal/command"
 	"github.com/git-fal7/friend-for-gate/internal/database"
+	"github.com/git-fal7/friend-for-gate/internal/event"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"go.minekube.com/gate/pkg/edition/java/proxy"
 )
@@ -27,6 +28,7 @@ func InitPlugin(ctx context.Context, proxy *proxy.Proxy) error {
 		return err
 	}
 	command.Init(proxy)
+	event.Init(proxy)
 
 	return nil
 }
