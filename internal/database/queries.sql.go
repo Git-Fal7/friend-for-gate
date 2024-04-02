@@ -61,6 +61,18 @@ func (q *Queries) CreateFriendstatusType(ctx context.Context) error {
 	return err
 }
 
+const createLookupUserTable = `-- name: CreateLookupUserTable :exec
+CREATE TABLE lookup_users (
+    user_uuid uuid PRIMARY KEY NOT NULL,
+    user_name varchar(16) NOT NULL
+)
+`
+
+func (q *Queries) CreateLookupUserTable(ctx context.Context) error {
+	_, err := q.db.ExecContext(ctx, createLookupUserTable)
+	return err
+}
+
 const createUsersTable = `-- name: CreateUsersTable :exec
 CREATE TABLE IF NOT EXISTS user_friend (
     id SERIAL PRIMARY KEY,
@@ -91,6 +103,19 @@ func (q *Queries) GetFriendStatus(ctx context.Context, arg GetFriendStatusParams
 	var friend_status Friendstatus
 	err := row.Scan(&friend_status)
 	return friend_status, err
+}
+
+const getUsernameFromLookupTable = `-- name: GetUsernameFromLookupTable :one
+SELECT user_name FROM lookup_users
+WHERE user_uuid = $1 
+LIMIT 1
+`
+
+func (q *Queries) GetUsernameFromLookupTable(ctx context.Context, userUuid uuid.UUID) (string, error) {
+	row := q.db.QueryRowContext(ctx, getUsernameFromLookupTable, userUuid)
+	var user_name string
+	err := row.Scan(&user_name)
+	return user_name, err
 }
 
 const listFriends = `-- name: ListFriends :many
@@ -124,6 +149,27 @@ func (q *Queries) ListFriends(ctx context.Context, uid1 uuid.UUID) ([]UserFriend
 		return nil, err
 	}
 	return items, nil
+}
+
+const logIntoLookupTable = `-- name: LogIntoLookupTable :exec
+INSERT INTO lookup_users (
+    user_uuid, user_name
+) VALUES (
+    $1, $2
+)
+ON CONFLICT(user_uuid)
+DO UPDATE SET
+user_name = $2
+`
+
+type LogIntoLookupTableParams struct {
+	UserUuid uuid.UUID
+	UserName string
+}
+
+func (q *Queries) LogIntoLookupTable(ctx context.Context, arg LogIntoLookupTableParams) error {
+	_, err := q.db.ExecContext(ctx, logIntoLookupTable, arg.UserUuid, arg.UserName)
+	return err
 }
 
 const removeFriendRequest = `-- name: RemoveFriendRequest :exec

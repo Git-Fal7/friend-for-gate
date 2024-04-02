@@ -53,6 +53,11 @@ func (ns NullFriendstatus) Value() (driver.Value, error) {
 	return string(ns.Friendstatus), nil
 }
 
+type LookupUser struct {
+	UserUuid uuid.UUID
+	UserName string
+}
+
 type UserFriend struct {
 	ID           int32
 	Uid1         uuid.UUID

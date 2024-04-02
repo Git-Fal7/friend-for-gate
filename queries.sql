@@ -16,6 +16,12 @@ DO $$ BEGIN
     END IF;
 END $$;
 
+-- name: CreateLookupUserTable :exec
+CREATE TABLE lookup_users (
+    user_uuid uuid PRIMARY KEY NOT NULL,
+    user_name varchar(16) NOT NULL
+);
+
 
 -- name: CreateFriendRequest :exec
 INSERT INTO user_friend (
@@ -41,3 +47,18 @@ WHERE (uid1 = $1 AND uid2 = $2) OR (uid1 = $2 AND uid2 = $1);
 -- name: ListFriends :many
 SELECT * FROM user_friend
 WHERE (uid1 = $1 OR uid2 = $1) AND friend_status = 'FRIEND';
+
+-- name: LogIntoLookupTable :exec
+INSERT INTO lookup_users (
+    user_uuid, user_name
+) VALUES (
+    $1, $2
+)
+ON CONFLICT(user_uuid)
+DO UPDATE SET
+user_name = $2;
+
+-- name: GetUsernameFromLookupTable :one
+SELECT user_name FROM lookup_users
+WHERE user_uuid = $1 
+LIMIT 1;
