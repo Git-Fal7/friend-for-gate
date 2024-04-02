@@ -19,6 +19,10 @@ func InitPlugin(ctx context.Context, proxy *proxy.Proxy) error {
 	}
 	DB = database.New(db)
 	// Init tables
+	err = DB.CreateFriendstatusType(context.Background())
+	if err != nil {
+		return err
+	}
 	err = DB.CreateUsersTable(context.Background())
 	if err != nil {
 		return err
