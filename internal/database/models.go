@@ -14,8 +14,7 @@ import (
 type Friendstatus string
 
 const (
-	FriendstatusREQUID1 Friendstatus = "REQ_UID1"
-	FriendstatusREQUID2 Friendstatus = "REQ_UID2"
+	FriendstatusPENDING Friendstatus = "PENDING"
 	FriendstatusFRIEND  Friendstatus = "FRIEND"
 )
 

@@ -1,6 +1,5 @@
-create type friendstatus as enum (
-  'REQ_UID1',
-  'REQ_UID2',
+CREATE TYPE friendstatus AS enum (
+  'PENDING',
   'FRIEND'
 );
 
