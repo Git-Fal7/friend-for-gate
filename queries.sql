@@ -8,8 +8,7 @@ CREATE TABLE user_friend (
 
 -- name: CreateFriendstatusType :exec
 CREATE TYPE friendstatus AS enum (
-  'REQ_UID1',
-  'REQ_UID2',
+  'PENDING',
   'FRIEND'
 );
 
@@ -17,5 +16,19 @@ CREATE TYPE friendstatus AS enum (
 INSERT INTO user_friend (
     uid1, uid2, friend_status
 ) VALUES (
-    $1, $2, 'REQ_UID1'
+    $1, $2, 'PENDING'
 );
+
+-- name: GetFriendStatus :one
+SELECT friend_status FROM user_friend
+WHERE (uid1 = $1 AND uid2 = $2) OR (uid1 = $2 AND uid = $1) 
+LIMIT 1;
+
+-- name: AcceptFriendRequest :exec
+UPDATE user_friend
+SET friend_status = 'FRIEND'
+WHERE (uid1 = $1 AND uid2 = $2) OR (uid1 = $2 AND uid = $1);
+
+-- name: RemoveFriendRequest :exec
+DELETE FROM user_friend
+WHERE (uid1 = $1 AND uid2 = $2) OR (uid1 = $2 AND uid = $1);

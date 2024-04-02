@@ -11,11 +11,27 @@ import (
 	"github.com/google/uuid"
 )
 
+const acceptFriendRequest = `-- name: AcceptFriendRequest :exec
+UPDATE user_friend
+SET friend_status = 'FRIEND'
+WHERE (uid1 = $1 AND uid2 = $2) OR (uid1 = $2 AND uid = $1)
+`
+
+type AcceptFriendRequestParams struct {
+	Uid1 uuid.UUID
+	Uid2 uuid.UUID
+}
+
+func (q *Queries) AcceptFriendRequest(ctx context.Context, arg AcceptFriendRequestParams) error {
+	_, err := q.db.ExecContext(ctx, acceptFriendRequest, arg.Uid1, arg.Uid2)
+	return err
+}
+
 const createFriendRequest = `-- name: CreateFriendRequest :exec
 INSERT INTO user_friend (
     uid1, uid2, friend_status
 ) VALUES (
-    $1, $2, 'REQ_UID1'
+    $1, $2, 'PENDING'
 )
 `
 
@@ -31,8 +47,7 @@ func (q *Queries) CreateFriendRequest(ctx context.Context, arg CreateFriendReque
 
 const createFriendstatusType = `-- name: CreateFriendstatusType :exec
 CREATE TYPE friendstatus AS enum (
-  'REQ_UID1',
-  'REQ_UID2',
+  'PENDING',
   'FRIEND'
 )
 `
@@ -53,5 +68,38 @@ CREATE TABLE user_friend (
 
 func (q *Queries) CreateUsersTable(ctx context.Context) error {
 	_, err := q.db.ExecContext(ctx, createUsersTable)
+	return err
+}
+
+const getFriendStatus = `-- name: GetFriendStatus :one
+SELECT friend_status FROM user_friend
+WHERE (uid1 = $1 AND uid2 = $2) OR (uid1 = $2 AND uid = $1) 
+LIMIT 1
+`
+
+type GetFriendStatusParams struct {
+	Uid1 uuid.UUID
+	Uid2 uuid.UUID
+}
+
+func (q *Queries) GetFriendStatus(ctx context.Context, arg GetFriendStatusParams) (Friendstatus, error) {
+	row := q.db.QueryRowContext(ctx, getFriendStatus, arg.Uid1, arg.Uid2)
+	var friend_status Friendstatus
+	err := row.Scan(&friend_status)
+	return friend_status, err
+}
+
+const removeFriendRequest = `-- name: RemoveFriendRequest :exec
+DELETE FROM user_friend
+WHERE (uid1 = $1 AND uid2 = $2) OR (uid1 = $2 AND uid = $1)
+`
+
+type RemoveFriendRequestParams struct {
+	Uid1 uuid.UUID
+	Uid2 uuid.UUID
+}
+
+func (q *Queries) RemoveFriendRequest(ctx context.Context, arg RemoveFriendRequestParams) error {
+	_, err := q.db.ExecContext(ctx, removeFriendRequest, arg.Uid1, arg.Uid2)
 	return err
 }
