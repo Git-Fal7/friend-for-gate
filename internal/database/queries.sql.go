@@ -89,6 +89,39 @@ func (q *Queries) GetFriendStatus(ctx context.Context, arg GetFriendStatusParams
 	return friend_status, err
 }
 
+const listFriends = `-- name: ListFriends :many
+SELECT id, uid1, uid2, friend_status FROM user_friend
+WHERE (uid1 = $1 OR uid2 = $1) AND friend_status = 'FRIEND'
+`
+
+func (q *Queries) ListFriends(ctx context.Context, uid1 uuid.UUID) ([]UserFriend, error) {
+	rows, err := q.db.QueryContext(ctx, listFriends, uid1)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []UserFriend
+	for rows.Next() {
+		var i UserFriend
+		if err := rows.Scan(
+			&i.ID,
+			&i.Uid1,
+			&i.Uid2,
+			&i.FriendStatus,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const removeFriendRequest = `-- name: RemoveFriendRequest :exec
 DELETE FROM user_friend
 WHERE (uid1 = $1 AND uid2 = $2) OR (uid1 = $2 AND uid = $1)

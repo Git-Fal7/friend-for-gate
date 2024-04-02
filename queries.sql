@@ -32,3 +32,7 @@ WHERE (uid1 = $1 AND uid2 = $2) OR (uid1 = $2 AND uid = $1);
 -- name: RemoveFriendRequest :exec
 DELETE FROM user_friend
 WHERE (uid1 = $1 AND uid2 = $2) OR (uid1 = $2 AND uid = $1);
+
+-- name: ListFriends :many
+SELECT * FROM user_friend
+WHERE (uid1 = $1 OR uid2 = $1) AND friend_status = 'FRIEND';
