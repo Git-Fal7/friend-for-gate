@@ -14,7 +14,7 @@ import (
 const acceptFriendRequest = `-- name: AcceptFriendRequest :exec
 UPDATE user_friend
 SET friend_status = 'FRIEND'
-WHERE (uid1 = $1 AND uid2 = $2) OR (uid1 = $2 AND uid = $1)
+WHERE (uid1 = $1 AND uid2 = $2) OR (uid1 = $2 AND uid2 = $1)
 `
 
 type AcceptFriendRequestParams struct {
@@ -77,7 +77,7 @@ func (q *Queries) CreateUsersTable(ctx context.Context) error {
 
 const getFriendStatus = `-- name: GetFriendStatus :one
 SELECT friend_status FROM user_friend
-WHERE (uid1 = $1 AND uid2 = $2) OR (uid1 = $2 AND uid = $1) 
+WHERE (uid1 = $1 AND uid2 = $2) OR (uid1 = $2 AND uid2 = $1) 
 LIMIT 1
 `
 
@@ -128,7 +128,7 @@ func (q *Queries) ListFriends(ctx context.Context, uid1 uuid.UUID) ([]UserFriend
 
 const removeFriendRequest = `-- name: RemoveFriendRequest :exec
 DELETE FROM user_friend
-WHERE (uid1 = $1 AND uid2 = $2) OR (uid1 = $2 AND uid = $1)
+WHERE (uid1 = $1 AND uid2 = $2) OR (uid1 = $2 AND uid2 = $1)
 `
 
 type RemoveFriendRequestParams struct {
