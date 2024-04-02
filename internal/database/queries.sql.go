@@ -29,12 +29,25 @@ func (q *Queries) CreateFriendRequest(ctx context.Context, arg CreateFriendReque
 	return err
 }
 
+const createFriendstatusType = `-- name: CreateFriendstatusType :exec
+CREATE TYPE friendstatus AS enum (
+  'REQ_UID1',
+  'REQ_UID2',
+  'FRIEND'
+)
+`
+
+func (q *Queries) CreateFriendstatusType(ctx context.Context) error {
+	_, err := q.db.ExecContext(ctx, createFriendstatusType)
+	return err
+}
+
 const createUsersTable = `-- name: CreateUsersTable :exec
 CREATE TABLE user_friend (
     id SERIAL PRIMARY KEY,
     uid1 uuid NOT NULL,
     uid2 uuid NOT NULL,
-    friend_status enum('REQ_UID1', 'REQ_UID2', 'FRIEND') NOT NULL
+    friend_status friendstatus NOT NULL
 )
 `
 

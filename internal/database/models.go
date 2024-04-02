@@ -5,12 +5,58 @@
 package database
 
 import (
+	"database/sql/driver"
+	"fmt"
+
 	"github.com/google/uuid"
 )
+
+type Friendstatus string
+
+const (
+	FriendstatusREQUID1 Friendstatus = "REQ_UID1"
+	FriendstatusREQUID2 Friendstatus = "REQ_UID2"
+	FriendstatusFRIEND  Friendstatus = "FRIEND"
+)
+
+func (e *Friendstatus) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = Friendstatus(s)
+	case string:
+		*e = Friendstatus(s)
+	default:
+		return fmt.Errorf("unsupported scan type for Friendstatus: %T", src)
+	}
+	return nil
+}
+
+type NullFriendstatus struct {
+	Friendstatus Friendstatus
+	Valid        bool // Valid is true if Friendstatus is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullFriendstatus) Scan(value interface{}) error {
+	if value == nil {
+		ns.Friendstatus, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.Friendstatus.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullFriendstatus) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.Friendstatus), nil
+}
 
 type UserFriend struct {
 	ID           int32
 	Uid1         uuid.UUID
 	Uid2         uuid.UUID
-	FriendStatus interface{}
+	FriendStatus Friendstatus
 }
