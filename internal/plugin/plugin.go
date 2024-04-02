@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/git-fal7/friend-for-gate/internal/database"
+	_ "github.com/jackc/pgx/v5/stdlib"
 	"go.minekube.com/gate/pkg/edition/java/proxy"
 )
 
