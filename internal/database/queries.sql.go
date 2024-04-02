@@ -46,10 +46,14 @@ func (q *Queries) CreateFriendRequest(ctx context.Context, arg CreateFriendReque
 }
 
 const createFriendstatusType = `-- name: CreateFriendstatusType :exec
-CREATE TYPE friendstatus AS enum (
-  'PENDING',
-  'FRIEND'
-)
+DO $$ BEGIN
+    IF to_regtype('friendstatus') IS NULL THEN
+        CREATE TYPE friendstatus AS enum (
+            'PENDING',
+            'FRIEND'
+        );
+    END IF;
+END $$
 `
 
 func (q *Queries) CreateFriendstatusType(ctx context.Context) error {
@@ -58,7 +62,7 @@ func (q *Queries) CreateFriendstatusType(ctx context.Context) error {
 }
 
 const createUsersTable = `-- name: CreateUsersTable :exec
-CREATE TABLE user_friend (
+CREATE TABLE IF NOT EXISTS user_friend (
     id SERIAL PRIMARY KEY,
     uid1 uuid NOT NULL,
     uid2 uuid NOT NULL,
