@@ -84,23 +84,18 @@ func friendCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 					Uid2: uuid.UUID(target.ID()),
 				}
 				friendStatus, err := database.DB.GetFriendStatus(context.Background(), getFriendStatusParams)
-				if err != nil {
-					player.SendMessage(&component.Text{
-						Content: "An error occured, please try again",
-					})
-					log.Println(err)
-					return nil
-				}
-				if friendStatus == database.FriendstatusPENDING {
-					player.SendMessage(&component.Text{
-						Content: fmt.Sprintf("You have already a request pending with %s", target.Username()),
-					})
-					return nil
-				} else if friendStatus == database.FriendstatusFRIEND {
-					player.SendMessage(&component.Text{
-						Content: fmt.Sprintf("You are already friends with %s", target.Username()),
-					})
-					return nil
+				if err == nil {
+					if friendStatus == database.FriendstatusPENDING {
+						player.SendMessage(&component.Text{
+							Content: fmt.Sprintf("You have already a request pending with %s", target.Username()),
+						})
+						return nil
+					} else if friendStatus == database.FriendstatusFRIEND {
+						player.SendMessage(&component.Text{
+							Content: fmt.Sprintf("You are already friends with %s", target.Username()),
+						})
+						return nil
+					}
 				}
 
 				createFriendRequestParams := database.CreateFriendRequestParams{
@@ -146,18 +141,13 @@ func friendCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 					Uid2: uuid.UUID(target.ID()),
 				}
 				friendStatus, err := database.DB.GetFriendStatus(context.Background(), getFriendStatusParams)
-				if err != nil {
-					player.SendMessage(&component.Text{
-						Content: "An error occured, please try again",
-					})
-					log.Println(err)
-					return nil
-				}
-				if friendStatus == database.FriendstatusFRIEND {
-					player.SendMessage(&component.Text{
-						Content: fmt.Sprintf("You are already friends with %s", target.Username()),
-					})
-					return nil
+				if err == nil {
+					if friendStatus == database.FriendstatusFRIEND {
+						player.SendMessage(&component.Text{
+							Content: fmt.Sprintf("You are already friends with %s", target.Username()),
+						})
+						return nil
+					}
 				}
 
 				acceptFriendRequetsParam := database.AcceptFriendRequestParams{
