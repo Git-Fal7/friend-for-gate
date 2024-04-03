@@ -6,6 +6,7 @@ import (
 	"log"
 	"strings"
 
+	"github.com/git-fal7/friend-for-gate/internal/config"
 	"github.com/git-fal7/friend-for-gate/internal/database"
 	"github.com/google/uuid"
 	"go.minekube.com/brigodier"
@@ -22,16 +23,7 @@ func friendCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 				return nil
 			}
 			player.SendMessage(&component.Text{
-				Content: "/friend add [player]",
-			})
-			player.SendMessage(&component.Text{
-				Content: "/friend remove [player]",
-			})
-			player.SendMessage(&component.Text{
-				Content: "/friend accept [player]",
-			})
-			player.SendMessage(&component.Text{
-				Content: "/friend list",
+				Content: config.ViperConfig.GetString("messages.friendHelpMessage"),
 			})
 			return nil
 		})).Then(brigodier.Argument("arg-1", brigodier.String).

@@ -1,0 +1,13 @@
+database:
+  hostname: localhost
+  port: 5432
+  username: admin
+  password: adminpassword
+  database: friends
+
+messages:
+  friendHelpMessage: |
+    /friend add [player]
+    /friend remove [player]
+    /friend accept [player]
+    /friend list
