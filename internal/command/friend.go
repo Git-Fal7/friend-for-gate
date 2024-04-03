@@ -68,6 +68,7 @@ func friendCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 			targetStr := c.String("player")
 			target := p.PlayerByName(targetStr)
 			var targetUUID uuid.UUID
+			var targetUsername string
 			if target == nil {
 				// Lookup player
 				lookupUserResult, err := database.DB.GetUserUUIDFromLookupTable(context.Background(), targetStr)
@@ -78,8 +79,10 @@ func friendCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 					return nil
 				}
 				targetUUID = lookupUserResult.UserUuid
+				targetUsername = lookupUserResult.UserName
 			} else {
 				targetUUID = uuid.UUID(target.ID())
+				targetUsername = target.Username()
 			}
 			if strings.ToLower(arg1) == "add" {
 				// check if have relations
@@ -91,12 +94,12 @@ func friendCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 				if err == nil {
 					if friendStatus == database.FriendstatusPENDING {
 						player.SendMessage(&component.Text{
-							Content: fmt.Sprintf("You have already a request pending with %s", target.Username()),
+							Content: fmt.Sprintf("You have already a request pending with %s", targetUsername),
 						})
 						return nil
 					} else if friendStatus == database.FriendstatusFRIEND {
 						player.SendMessage(&component.Text{
-							Content: fmt.Sprintf("You are already friends with %s", target.Username()),
+							Content: fmt.Sprintf("You are already friends with %s", targetUsername),
 						})
 						return nil
 					}
@@ -115,11 +118,13 @@ func friendCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 					return nil
 				}
 				player.SendMessage(&component.Text{
-					Content: fmt.Sprintf("Sent friend request to %s", target.Username()),
+					Content: fmt.Sprintf("Sent friend request to %s", targetUsername),
 				})
-				target.SendMessage(&component.Text{
-					Content: fmt.Sprintf("%s sent you a friend request, accept by /friend accept %s", player.Username(), player.Username()),
-				})
+				if target != nil {
+					target.SendMessage(&component.Text{
+						Content: fmt.Sprintf("%s sent you a friend request, accept by /friend accept %s", player.Username(), player.Username()),
+					})
+				}
 			} else if strings.ToLower(arg1) == "remove" {
 				// remove
 				removeFriendRequestParam := database.RemoveFriendRequestParams{
