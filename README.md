@@ -19,3 +19,7 @@ func main() {
 	gate.Execute()
 }
 ```
+
+# requirements
+
+a working PostgreSQL database.
