@@ -42,7 +42,7 @@ func friendCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 			}
 			arg1 := c.String("arg-1")
 			if strings.ToLower(arg1) == "list" {
-				friends, err := database.DB.ListFriends(context.Background(), uuid.UUID(player.ID()))
+				friends, err := database.DB.ListFriendsLookup(context.Background(), uuid.UUID(player.ID()))
 				if err != nil {
 					player.SendMessage(&component.Text{
 						Content: "An error occured, please try again",
@@ -51,18 +51,8 @@ func friendCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 					return nil
 				}
 				for _, friend := range friends {
-					friendUUID := friend.Uid1
-					if friendUUID == uuid.UUID(player.ID()) {
-						friendUUID = friend.Uid2
-					}
-					// This is stupid, should be cached in memory or we do a single query instead of multiple.
-					lookupResult, err := database.DB.GetUsernameFromLookupTable(context.Background(), friendUUID)
-					if err != nil {
-						log.Println(err)
-						continue
-					}
 					player.SendMessage(&component.Text{
-						Content: fmt.Sprintf("Friend: %s", lookupResult.UserName),
+						Content: fmt.Sprintf("Friend: %s", friend.UserName),
 					})
 				}
 			}
