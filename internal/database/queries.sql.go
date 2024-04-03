@@ -14,7 +14,7 @@ import (
 const acceptFriendRequest = `-- name: AcceptFriendRequest :exec
 UPDATE user_friend
 SET friend_status = 'FRIEND'
-WHERE (uid1 = $2 AND uid2 = $1)
+WHERE uid2 = $1 AND uid1 = $2
 `
 
 type AcceptFriendRequestParams struct {
