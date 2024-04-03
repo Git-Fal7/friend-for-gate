@@ -14,16 +14,16 @@ import (
 const acceptFriendRequest = `-- name: AcceptFriendRequest :exec
 UPDATE user_friend
 SET friend_status = 'FRIEND'
-WHERE uid2 = $1 AND uid1 = $2
+WHERE uid1 = $1 AND uid2 = $2
 `
 
 type AcceptFriendRequestParams struct {
-	Uid2 uuid.UUID
 	Uid1 uuid.UUID
+	Uid2 uuid.UUID
 }
 
 func (q *Queries) AcceptFriendRequest(ctx context.Context, arg AcceptFriendRequestParams) error {
-	_, err := q.db.ExecContext(ctx, acceptFriendRequest, arg.Uid2, arg.Uid1)
+	_, err := q.db.ExecContext(ctx, acceptFriendRequest, arg.Uid1, arg.Uid2)
 	return err
 }
 

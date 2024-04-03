@@ -38,7 +38,7 @@ LIMIT 1;
 -- name: AcceptFriendRequest :exec
 UPDATE user_friend
 SET friend_status = 'FRIEND'
-WHERE uid2 = $1 AND uid1 = $2;
+WHERE uid1 = $1 AND uid2 = $2;
 
 -- name: RemoveFriendRequest :exec
 DELETE FROM user_friend
