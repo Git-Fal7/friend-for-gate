@@ -77,7 +77,7 @@ func friendCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 			arg1 := c.String("arg-1")
 			targetStr := c.String("player")
 			target := p.PlayerByName(targetStr)
-			targetUUID := uuid.UUID(target.ID())
+			var targetUUID uuid.UUID
 			if target == nil {
 				// Lookup player
 				lookupUserResult, err := database.DB.GetUserUUIDFromLookupTable(context.Background(), strings.ToLower(targetStr))
