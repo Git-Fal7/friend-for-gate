@@ -17,8 +17,8 @@ func InitConfig() {
 
 	ViperConfig.SetDefault("messages.friendHelpMessage",
 		`/friend add [player]
-		/friend remove [player]
-		/friend accept [player]
-		/friend list`)
+/friend remove [player]
+/friend accept [player]
+/friend list`)
 
 }
