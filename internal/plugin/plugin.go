@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/git-fal7/friend-for-gate/internal/command"
+	"github.com/git-fal7/friend-for-gate/internal/config"
 	"github.com/git-fal7/friend-for-gate/internal/database"
 	"github.com/git-fal7/friend-for-gate/internal/event"
 	_ "github.com/jackc/pgx/v5/stdlib"
@@ -31,6 +32,7 @@ func InitPlugin(ctx context.Context, proxy *proxy.Proxy) error {
 	if err != nil {
 		return err
 	}
+	config.InitConfig()
 	command.Init(proxy)
 	event.Init(proxy)
 
