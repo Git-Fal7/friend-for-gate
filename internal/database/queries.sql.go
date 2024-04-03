@@ -105,38 +105,6 @@ func (q *Queries) GetFriendStatus(ctx context.Context, arg GetFriendStatusParams
 	return friend_status, err
 }
 
-const getFriendsPlayerInfo = `-- name: GetFriendsPlayerInfo :many
-SELECT user_uuid, user_name FROM lookup_users
-WHERE lookup_users.user_uuid in (
-        select user_friend.uid1 from user_friend where user_friend.uid2 = $1 AND user_friend.friend_status = 'FRIEND'
-	) OR lookup_users.user_uuid in (
-        select user_friend.uid2 from user_friend where user_friend.uid1 = $1 AND user_friend.friend_status = 'FRIEND'
-	)
-`
-
-func (q *Queries) GetFriendsPlayerInfo(ctx context.Context, uid2 uuid.UUID) ([]LookupUser, error) {
-	rows, err := q.db.QueryContext(ctx, getFriendsPlayerInfo, uid2)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []LookupUser
-	for rows.Next() {
-		var i LookupUser
-		if err := rows.Scan(&i.UserUuid, &i.UserName); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const getUserUUIDFromLookupTable = `-- name: GetUserUUIDFromLookupTable :one
 SELECT user_uuid, user_name FROM lookup_users
 WHERE user_name = $1 
@@ -183,6 +151,38 @@ func (q *Queries) ListFriends(ctx context.Context, uid1 uuid.UUID) ([]UserFriend
 			&i.Uid2,
 			&i.FriendStatus,
 		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listFriendsLookup = `-- name: ListFriendsLookup :many
+SELECT user_uuid, user_name FROM lookup_users
+WHERE lookup_users.user_uuid in (
+        select user_friend.uid1 from user_friend where user_friend.uid2 = $1 AND user_friend.friend_status = 'FRIEND'
+	) OR lookup_users.user_uuid in (
+        select user_friend.uid2 from user_friend where user_friend.uid1 = $1 AND user_friend.friend_status = 'FRIEND'
+	)
+`
+
+func (q *Queries) ListFriendsLookup(ctx context.Context, uid2 uuid.UUID) ([]LookupUser, error) {
+	rows, err := q.db.QueryContext(ctx, listFriendsLookup, uid2)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []LookupUser
+	for rows.Next() {
+		var i LookupUser
+		if err := rows.Scan(&i.UserUuid, &i.UserName); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

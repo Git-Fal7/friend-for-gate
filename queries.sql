@@ -68,7 +68,7 @@ SELECT * FROM lookup_users
 WHERE user_uuid = $1 
 LIMIT 1;
 
--- name: GetFriendsPlayerInfo :many
+-- name: ListFriendsLookup :many
 SELECT * FROM lookup_users
 WHERE lookup_users.user_uuid in (
         select user_friend.uid1 from user_friend where user_friend.uid2 = $1 AND user_friend.friend_status = 'FRIEND'
