@@ -105,14 +105,27 @@ func (q *Queries) GetFriendStatus(ctx context.Context, arg GetFriendStatusParams
 	return friend_status, err
 }
 
-const getUserFromLookupTable = `-- name: GetUserFromLookupTable :one
+const getUserUUIDFromLookupTable = `-- name: GetUserUUIDFromLookupTable :one
+SELECT user_uuid, user_name FROM lookup_users
+WHERE user_name = $1 
+LIMIT 1
+`
+
+func (q *Queries) GetUserUUIDFromLookupTable(ctx context.Context, userName string) (LookupUser, error) {
+	row := q.db.QueryRowContext(ctx, getUserUUIDFromLookupTable, userName)
+	var i LookupUser
+	err := row.Scan(&i.UserUuid, &i.UserName)
+	return i, err
+}
+
+const getUsernameFromLookupTable = `-- name: GetUsernameFromLookupTable :one
 SELECT user_uuid, user_name FROM lookup_users
 WHERE user_uuid = $1 
 LIMIT 1
 `
 
-func (q *Queries) GetUserFromLookupTable(ctx context.Context, userUuid uuid.UUID) (LookupUser, error) {
-	row := q.db.QueryRowContext(ctx, getUserFromLookupTable, userUuid)
+func (q *Queries) GetUsernameFromLookupTable(ctx context.Context, userUuid uuid.UUID) (LookupUser, error) {
+	row := q.db.QueryRowContext(ctx, getUsernameFromLookupTable, userUuid)
 	var i LookupUser
 	err := row.Scan(&i.UserUuid, &i.UserName)
 	return i, err

@@ -62,3 +62,8 @@ user_name = $2;
 SELECT * FROM lookup_users
 WHERE user_name = $1 
 LIMIT 1;
+
+-- name: GetUsernameFromLookupTable :one
+SELECT * FROM lookup_users
+WHERE user_uuid = $1 
+LIMIT 1;
