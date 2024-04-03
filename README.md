@@ -1,6 +1,6 @@
 # friend-for-gate
 
-A friend system plugin for the [Gate](https://golang.org/doc/install) proxy
+A friend system plugin for the [Gate](https://gate.minekube.com/) proxy
 
 # getting started
 
