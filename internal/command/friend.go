@@ -55,8 +55,14 @@ func friendCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 					if friendUUID == uuid.UUID(player.ID()) {
 						friendUUID = friend.Uid2
 					}
+					// This is stupid, should be cached in memory or we do a single query instead of multiple.
+					lookupResult, err := database.DB.GetUsernameFromLookupTable(context.Background(), friendUUID)
+					if err != nil {
+						log.Println(err)
+						continue
+					}
 					player.SendMessage(&component.Text{
-						Content: fmt.Sprintf("Friend: %v", friendUUID),
+						Content: fmt.Sprintf("Friend: %s", lookupResult.UserName),
 					})
 				}
 			}
@@ -71,17 +77,23 @@ func friendCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 			arg1 := c.String("arg-1")
 			targetStr := c.String("player")
 			target := p.PlayerByName(targetStr)
+			targetUUID := uuid.UUID(target.ID())
 			if target == nil {
-				player.SendMessage(&component.Text{
-					Content: "Invalid player",
-				})
-				return nil
+				// Lookup player
+				lookupUserResult, err := database.DB.GetUserUUIDFromLookupTable(context.Background(), strings.ToLower(targetStr))
+				if err != nil {
+					player.SendMessage(&component.Text{
+						Content: "Invalid player",
+					})
+					return nil
+				}
+				targetUUID = lookupUserResult.UserUuid
 			}
 			if strings.ToLower(arg1) == "add" {
 				// check if have relations
 				getFriendStatusParams := database.GetFriendStatusParams{
 					Uid1: uuid.UUID(player.ID()),
-					Uid2: uuid.UUID(target.ID()),
+					Uid2: targetUUID,
 				}
 				friendStatus, err := database.DB.GetFriendStatus(context.Background(), getFriendStatusParams)
 				if err == nil {
@@ -100,7 +112,7 @@ func friendCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 
 				createFriendRequestParams := database.CreateFriendRequestParams{
 					Uid1: uuid.UUID(player.ID()),
-					Uid2: uuid.UUID(target.ID()),
+					Uid2: targetUUID,
 				}
 				err = database.DB.CreateFriendRequest(context.Background(), createFriendRequestParams)
 				if err != nil {
@@ -120,7 +132,7 @@ func friendCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 				// remove
 				removeFriendRequestParam := database.RemoveFriendRequestParams{
 					Uid1: uuid.UUID(player.ID()),
-					Uid2: uuid.UUID(target.ID()),
+					Uid2: targetUUID,
 				}
 				err := database.DB.RemoveFriendRequest(context.Background(), removeFriendRequestParam)
 				if err != nil {
@@ -138,7 +150,7 @@ func friendCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 				// check if have relations
 				getFriendStatusParams := database.GetFriendStatusParams{
 					Uid1: uuid.UUID(player.ID()),
-					Uid2: uuid.UUID(target.ID()),
+					Uid2: targetUUID,
 				}
 				friendStatus, err := database.DB.GetFriendStatus(context.Background(), getFriendStatusParams)
 				if err == nil {
@@ -152,7 +164,7 @@ func friendCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 
 				acceptFriendRequetsParam := database.AcceptFriendRequestParams{
 					Uid1: uuid.UUID(player.ID()),
-					Uid2: uuid.UUID(target.ID()),
+					Uid2: targetUUID,
 				}
 				err = database.DB.AcceptFriendRequest(context.Background(), acceptFriendRequetsParam)
 				if err != nil {
