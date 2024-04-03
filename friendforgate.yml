@@ -6,7 +6,7 @@ database:
   database: friends
 
 messages:
-  friendHelpMessage: |
+  friendHelpMessage: |-
     /friend add [player]
     /friend remove [player]
     /friend accept [player]
