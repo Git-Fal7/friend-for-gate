@@ -145,13 +145,18 @@ func friendCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 					Uid2: targetUUID,
 				}
 				friendStatus, err := database.DB.GetFriendStatus(context.Background(), getFriendStatusParams)
-				if err == nil {
-					if friendStatus == database.FriendstatusFRIEND {
-						player.SendMessage(&component.Text{
-							Content: fmt.Sprintf("You are already friends with %s", target.Username()),
-						})
-						return nil
-					}
+				if err != nil {
+					player.SendMessage(&component.Text{
+						Content: "you dont have a request from this player",
+					})
+					log.Println(err)
+					return nil
+				}
+				if friendStatus == database.FriendstatusFRIEND {
+					player.SendMessage(&component.Text{
+						Content: fmt.Sprintf("You are already friends with %s", target.Username()),
+					})
+					return nil
 				}
 
 				acceptFriendRequetsParam := database.AcceptFriendRequestParams{
@@ -166,12 +171,19 @@ func friendCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 					log.Println(err)
 					return nil
 				}
-				player.SendMessage(&component.Text{
-					Content: fmt.Sprintf("You are now friends with %s", target.Username()),
-				})
-				target.SendMessage(&component.Text{
-					Content: fmt.Sprintf("You are now friends with %s", player.Username()),
-				})
+				friendStatus, _ = database.DB.GetFriendStatus(context.Background(), getFriendStatusParams)
+				if friendStatus == database.FriendstatusFRIEND {
+					player.SendMessage(&component.Text{
+						Content: fmt.Sprintf("You are now friends with %s", target.Username()),
+					})
+					target.SendMessage(&component.Text{
+						Content: fmt.Sprintf("You are now friends with %s", player.Username()),
+					})
+				} else {
+					player.SendMessage(&component.Text{
+						Content: "You already sent a friend request",
+					})
+				}
 			}
 			return nil
 		})),
