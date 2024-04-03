@@ -141,7 +141,7 @@ func friendCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 				}
 				// just send to the player
 				player.SendMessage(&component.Text{
-					Content: fmt.Sprintf("Removed %s", target.Username()),
+					Content: fmt.Sprintf("Removed %s", targetUsername),
 				})
 			} else if strings.ToLower(arg1) == "accept" {
 				// check if have relations
@@ -159,7 +159,7 @@ func friendCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 				}
 				if friendStatus == database.FriendstatusFRIEND {
 					player.SendMessage(&component.Text{
-						Content: fmt.Sprintf("You are already friends with %s", target.Username()),
+						Content: fmt.Sprintf("You are already friends with %s", targetUsername),
 					})
 					return nil
 				}
@@ -179,11 +179,13 @@ func friendCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 				friendStatus, _ = database.DB.GetFriendStatus(context.Background(), getFriendStatusParams)
 				if friendStatus == database.FriendstatusFRIEND {
 					player.SendMessage(&component.Text{
-						Content: fmt.Sprintf("You are now friends with %s", target.Username()),
+						Content: fmt.Sprintf("You are now friends with %s", targetUsername),
 					})
-					target.SendMessage(&component.Text{
-						Content: fmt.Sprintf("You are now friends with %s", player.Username()),
-					})
+					if target != nil {
+						target.SendMessage(&component.Text{
+							Content: fmt.Sprintf("You are now friends with %s", player.Username()),
+						})
+					}
 				} else {
 					player.SendMessage(&component.Text{
 						Content: "You already sent a friend request",
