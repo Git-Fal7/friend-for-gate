@@ -60,7 +60,7 @@ user_name = $2;
 
 -- name: GetUserUUIDFromLookupTable :one
 SELECT * FROM lookup_users
-WHERE user_name = $1 
+WHERE LOWER(user_name) = LOWER($1) 
 LIMIT 1;
 
 -- name: GetUsernameFromLookupTable :one

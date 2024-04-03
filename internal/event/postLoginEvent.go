@@ -3,7 +3,6 @@ package event
 import (
 	"context"
 	"log"
-	"strings"
 
 	"github.com/git-fal7/friend-for-gate/internal/database"
 	"github.com/google/uuid"
@@ -15,7 +14,7 @@ func loginEvent(p *proxy.Proxy) func(*proxy.PostLoginEvent) {
 		// log into lookup table
 		logIntoLookupTableParam := database.LogIntoLookupTableParams{
 			UserUuid: uuid.UUID(e.Player().ID()),
-			UserName: strings.ToLower(e.Player().Username()),
+			UserName: e.Player().Username(),
 		}
 		err := database.DB.LogIntoLookupTable(context.Background(), logIntoLookupTableParam)
 		if err != nil {

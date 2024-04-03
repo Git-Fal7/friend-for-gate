@@ -70,7 +70,7 @@ func friendCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 			var targetUUID uuid.UUID
 			if target == nil {
 				// Lookup player
-				lookupUserResult, err := database.DB.GetUserUUIDFromLookupTable(context.Background(), strings.ToLower(targetStr))
+				lookupUserResult, err := database.DB.GetUserUUIDFromLookupTable(context.Background(), targetStr)
 				if err != nil {
 					player.SendMessage(&component.Text{
 						Content: "Invalid player",

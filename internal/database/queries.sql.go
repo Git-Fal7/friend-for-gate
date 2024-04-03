@@ -107,12 +107,12 @@ func (q *Queries) GetFriendStatus(ctx context.Context, arg GetFriendStatusParams
 
 const getUserUUIDFromLookupTable = `-- name: GetUserUUIDFromLookupTable :one
 SELECT user_uuid, user_name FROM lookup_users
-WHERE user_name = $1 
+WHERE LOWER(user_name) = LOWER($1) 
 LIMIT 1
 `
 
-func (q *Queries) GetUserUUIDFromLookupTable(ctx context.Context, userName string) (LookupUser, error) {
-	row := q.db.QueryRowContext(ctx, getUserUUIDFromLookupTable, userName)
+func (q *Queries) GetUserUUIDFromLookupTable(ctx context.Context, lower string) (LookupUser, error) {
+	row := q.db.QueryRowContext(ctx, getUserUUIDFromLookupTable, lower)
 	var i LookupUser
 	err := row.Scan(&i.UserUuid, &i.UserName)
 	return i, err
