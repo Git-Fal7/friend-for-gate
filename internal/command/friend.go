@@ -15,6 +15,13 @@ import (
 	"go.minekube.com/gate/pkg/edition/java/proxy"
 )
 
+func replaceAll(str string, replaceMap map[string]string) string {
+	for key, value := range replaceMap {
+		str = strings.ReplaceAll(str, key, value)
+	}
+	return str
+}
+
 func friendCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 	return brigodier.Literal("friend").
 		Executes(command.Command(func(c *command.Context) error {
@@ -44,11 +51,12 @@ func friendCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 				}
 				for _, friend := range friends {
 					player.SendMessage(&component.Text{
-						Content: fmt.Sprintf("Friend: %s", friend.UserName),
+						Content: replaceAll(config.ViperConfig.GetString("messages.friendListFriend"), map[string]string{
+							"%friend%": friend.UserName,
+						}),
 					})
 				}
 			}
-
 			return nil
 		})).Then(brigodier.Argument("player", brigodier.String).
 		Executes(command.Command(func(c *command.Context) error {
@@ -66,7 +74,7 @@ func friendCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 				lookupUserResult, err := database.DB.GetUserUUIDFromLookupTable(context.Background(), targetStr)
 				if err != nil {
 					player.SendMessage(&component.Text{
-						Content: "Invalid player",
+						Content: config.ViperConfig.GetString("messages.playerNotFound"),
 					})
 					return nil
 				}
@@ -86,12 +94,18 @@ func friendCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 				if err == nil {
 					if friendStatus == database.FriendstatusPENDING {
 						player.SendMessage(&component.Text{
-							Content: fmt.Sprintf("You have already a request pending with %s", targetUsername),
+							Content: replaceAll(config.ViperConfig.GetString("messages.errorAlreadyRequest"), map[string]string{
+								"%sender%":   player.Username(),
+								"%receiver%": targetUsername,
+							}),
 						})
 						return nil
 					} else if friendStatus == database.FriendstatusFRIEND {
 						player.SendMessage(&component.Text{
-							Content: fmt.Sprintf("You are already friends with %s", targetUsername),
+							Content: replaceAll(config.ViperConfig.GetString("messages.errorAlreadyFriends"), map[string]string{
+								"%sender%":   player.Username(),
+								"%receiver%": targetUsername,
+							}),
 						})
 						return nil
 					}
@@ -110,11 +124,17 @@ func friendCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 					return nil
 				}
 				player.SendMessage(&component.Text{
-					Content: fmt.Sprintf("Sent friend request to %s", targetUsername),
+					Content: replaceAll(config.ViperConfig.GetString("messages.friendSenderSentRequest"), map[string]string{
+						"%sender%":   player.Username(),
+						"%receiver%": targetUsername,
+					}),
 				})
 				if target != nil {
 					target.SendMessage(&component.Text{
-						Content: fmt.Sprintf("%s sent you a friend request, accept by /friend accept %s", player.Username(), player.Username()),
+						Content: replaceAll(config.ViperConfig.GetString("messages.friendReceiverSentRequest"), map[string]string{
+							"%sender%":   player.Username(),
+							"%receiver%": targetUsername,
+						}),
 					})
 				}
 			} else if strings.ToLower(arg1) == "remove" {
@@ -144,14 +164,20 @@ func friendCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 				friendStatus, err := database.DB.GetFriendStatus(context.Background(), getFriendStatusParams)
 				if err != nil {
 					player.SendMessage(&component.Text{
-						Content: "you dont have a request from this player",
+						Content: replaceAll(config.ViperConfig.GetString("messages.errorNoRequest"), map[string]string{
+							"%sender%":   player.Username(),
+							"%receiver%": targetUsername,
+						}),
 					})
 					log.Println(err)
 					return nil
 				}
 				if friendStatus == database.FriendstatusFRIEND {
 					player.SendMessage(&component.Text{
-						Content: fmt.Sprintf("You are already friends with %s", targetUsername),
+						Content: replaceAll(config.ViperConfig.GetString("messages.errorAlreadyFriends"), map[string]string{
+							"%sender%":   player.Username(),
+							"%receiver%": targetUsername,
+						}),
 					})
 					return nil
 				}
@@ -171,16 +197,23 @@ func friendCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 				friendStatus, _ = database.DB.GetFriendStatus(context.Background(), getFriendStatusParams)
 				if friendStatus == database.FriendstatusFRIEND {
 					player.SendMessage(&component.Text{
-						Content: fmt.Sprintf("You are now friends with %s", targetUsername),
+						Content: replaceAll(config.ViperConfig.GetString("messages.friendNowFriends"), map[string]string{
+							"%player%": targetUsername,
+						}),
 					})
 					if target != nil {
 						target.SendMessage(&component.Text{
-							Content: fmt.Sprintf("You are now friends with %s", player.Username()),
+							Content: replaceAll(config.ViperConfig.GetString("messages.friendNowFriends"), map[string]string{
+								"%player%": player.Username(),
+							}),
 						})
 					}
 				} else {
 					player.SendMessage(&component.Text{
-						Content: "You already sent a friend request",
+						Content: replaceAll(config.ViperConfig.GetString("messages.errorAlreadyRequest"), map[string]string{
+							"%sender%":   player.Username(),
+							"%receiver%": targetUsername,
+						}),
 					})
 				}
 			}

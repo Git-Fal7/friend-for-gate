@@ -11,3 +11,11 @@ messages:
     /friend remove [player]
     /friend accept [player]
     /friend list
+  friendSenderSentRequest: "Sent friend request to %receiver%"
+  friendReceiverSentRequest: "%sender% sent you a friend request, accept by /friend accept %sender%"
+  friendNowFriends: "You are now friends with %player%"
+  friendListFriend: "Friendlist: %friend%"
+  errorPlayerNotFound: "Couldnt find that player"
+  errorAlreadyRequest: "You have already a request pending with %receiver%"
+  errorAlreadyFriends: "You have already friends with %receiver%"
+  errorNoRequest: "You dont have a request from this player"
