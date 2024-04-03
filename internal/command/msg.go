@@ -41,11 +41,10 @@ func msgCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 				return nil
 			}
 			message := c.String("message")
-			targetName := c.String("player")
-			target := p.PlayerByName(targetName)
+			target := p.PlayerByName(c.String("player"))
 			if target == nil {
 				player.SendMessage(&component.Text{
-					Content: config.ViperConfig.GetString("messages.playerNotFound"),
+					Content: config.ViperConfig.GetString("messages.errorPlayerNotFound"),
 				})
 				return nil
 			}

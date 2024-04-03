@@ -74,7 +74,7 @@ func friendCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 				lookupUserResult, err := database.DB.GetUserUUIDFromLookupTable(context.Background(), targetStr)
 				if err != nil {
 					player.SendMessage(&component.Text{
-						Content: config.ViperConfig.GetString("messages.playerNotFound"),
+						Content: config.ViperConfig.GetString("messages.errorPlayerNotFound"),
 					})
 					return nil
 				}
