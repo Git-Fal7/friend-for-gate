@@ -5,6 +5,7 @@ import "github.com/spf13/viper"
 var ViperConfig = viper.New()
 
 func InitConfig() {
+	ViperConfig.AddConfigPath(".")
 	ViperConfig.SetConfigName("friendforgate")
 	ViperConfig.SetConfigType("yaml")
 	ViperConfig.ReadInConfig()
