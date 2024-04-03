@@ -14,7 +14,11 @@ import (
 )
 
 func InitPlugin(ctx context.Context, proxy *proxy.Proxy) error {
-	db, err := sql.Open("pgx", fmt.Sprintf("user=%s password=%s host=%s port=%s database=%s sslmode=disable", "admin", "adminpassword", "localhost", "5432", "friends"))
+	config.InitConfig()
+	db, err := sql.Open("pgx", fmt.Sprintf("user=%s password=%s host=%s port=%s database=%s",
+		config.ViperConfig.GetString("database.username"), config.ViperConfig.GetString("database.password"),
+		config.ViperConfig.GetString("database.hostname"), config.ViperConfig.GetString("database.port"),
+		config.ViperConfig.GetString("database.database")))
 	if err != nil {
 		return err
 	}
@@ -32,7 +36,6 @@ func InitPlugin(ctx context.Context, proxy *proxy.Proxy) error {
 	if err != nil {
 		return err
 	}
-	config.InitConfig()
 	command.Init(proxy)
 	event.Init(proxy)
 
