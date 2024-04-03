@@ -88,6 +88,8 @@ func friendCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 					return nil
 				}
 				targetUUID = lookupUserResult.UserUuid
+			} else {
+				targetUUID = uuid.UUID(target.ID())
 			}
 			if strings.ToLower(arg1) == "add" {
 				// check if have relations
