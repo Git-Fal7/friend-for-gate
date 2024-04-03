@@ -58,7 +58,7 @@ ON CONFLICT(user_uuid)
 DO UPDATE SET
 user_name = $2;
 
--- name: GetUsernameFromLookupTable :one
-SELECT user_name FROM lookup_users
-WHERE user_uuid = $1 
+-- name: GetUserUUIDFromLookupTable :one
+SELECT * FROM lookup_users
+WHERE user_name = $1 
 LIMIT 1;

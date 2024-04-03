@@ -105,17 +105,17 @@ func (q *Queries) GetFriendStatus(ctx context.Context, arg GetFriendStatusParams
 	return friend_status, err
 }
 
-const getUsernameFromLookupTable = `-- name: GetUsernameFromLookupTable :one
-SELECT user_name FROM lookup_users
+const getUserFromLookupTable = `-- name: GetUserFromLookupTable :one
+SELECT user_uuid, user_name FROM lookup_users
 WHERE user_uuid = $1 
 LIMIT 1
 `
 
-func (q *Queries) GetUsernameFromLookupTable(ctx context.Context, userUuid uuid.UUID) (string, error) {
-	row := q.db.QueryRowContext(ctx, getUsernameFromLookupTable, userUuid)
-	var user_name string
-	err := row.Scan(&user_name)
-	return user_name, err
+func (q *Queries) GetUserFromLookupTable(ctx context.Context, userUuid uuid.UUID) (LookupUser, error) {
+	row := q.db.QueryRowContext(ctx, getUserFromLookupTable, userUuid)
+	var i LookupUser
+	err := row.Scan(&i.UserUuid, &i.UserName)
+	return i, err
 }
 
 const listFriends = `-- name: ListFriends :many
