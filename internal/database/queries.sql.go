@@ -62,7 +62,7 @@ func (q *Queries) CreateFriendstatusType(ctx context.Context) error {
 }
 
 const createLookupUserTable = `-- name: CreateLookupUserTable :exec
-CREATE TABLE lookup_users (
+CREATE TABLE IF NOT EXISTS lookup_users (
     user_uuid uuid PRIMARY KEY NOT NULL,
     user_name varchar(16) NOT NULL
 )

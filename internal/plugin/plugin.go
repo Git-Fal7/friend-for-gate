@@ -27,6 +27,10 @@ func InitPlugin(ctx context.Context, proxy *proxy.Proxy) error {
 	if err != nil {
 		return err
 	}
+	err = database.DB.CreateLookupUserTable(context.Background())
+	if err != nil {
+		return err
+	}
 	command.Init(proxy)
 	event.Init(proxy)
 
