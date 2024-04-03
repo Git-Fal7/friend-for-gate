@@ -155,8 +155,8 @@ func friendCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 				}
 
 				acceptFriendRequetsParam := database.AcceptFriendRequestParams{
-					Uid1: uuid.UUID(player.ID()),
-					Uid2: targetUUID,
+					Uid1: targetUUID,
+					Uid2: uuid.UUID(player.ID()),
 				}
 				err = database.DB.AcceptFriendRequest(context.Background(), acceptFriendRequetsParam)
 				if err != nil {
