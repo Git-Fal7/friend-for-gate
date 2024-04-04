@@ -3,8 +3,10 @@ module github.com/git-fal7/friend-for-gate
 go 1.22.0
 
 require (
+	github.com/go-sql-driver/mysql v1.8.1
 	github.com/google/uuid v1.6.0
 	github.com/jackc/pgx/v5 v5.5.5
+	github.com/mattn/go-sqlite3 v1.14.22
 	github.com/robinbraemer/event v0.0.1
 	github.com/spf13/viper v1.18.2
 	go.minekube.com/brigodier v0.0.1
@@ -13,6 +15,7 @@ require (
 )
 
 require (
+	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/Tnze/go-mc v1.20.2-0.20231123224931-bc3d77d78437 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/dboslee/lru v0.0.1 // indirect

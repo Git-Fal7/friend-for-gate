@@ -10,6 +10,7 @@ func InitConfig() {
 	ViperConfig.SetConfigType("yaml")
 	ViperConfig.ReadInConfig()
 
+	ViperConfig.SetDefault("database.type", "postgresql")
 	ViperConfig.SetDefault("database.hostname", "localhost")
 	ViperConfig.SetDefault("database.port", 5432)
 	ViperConfig.SetDefault("database.username", "admin")
