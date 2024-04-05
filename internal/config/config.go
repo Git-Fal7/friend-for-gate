@@ -25,8 +25,11 @@ func InitConfig() {
 	ViperConfig.SetDefault("messages.friendReceiverSentRequest", "%sender% sent you a friend request, accept by /friend accept %sender%")
 	ViperConfig.SetDefault("messages.friendNowFriends", "You are now friends with %player%")
 	ViperConfig.SetDefault("messages.friendListFriend", "Friendlist: %friend%")
+	ViperConfig.SetDefault("messages.friendSucessfullyRemoved", "Removed %friend%")
 	ViperConfig.SetDefault("messages.errorPlayerNotFound", "Couldnt find that player")
 	ViperConfig.SetDefault("messages.errorAlreadyRequest", "You have already a request pending with %receiver%")
 	ViperConfig.SetDefault("messages.errorAlreadyFriends", "You have already friends with %receiver%")
 	ViperConfig.SetDefault("messages.errorNoRequest", "You dont have a request from this player")
+	ViperConfig.SetDefault("messages.errorNotInFriendList", "That player is not in your friend list")
+	ViperConfig.SetDefault("messages.errorOccured", "An error occured, please try again")
 }

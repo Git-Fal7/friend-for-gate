@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"strings"
 
@@ -44,7 +43,7 @@ func friendCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 				friends, err := database.DB.ListFriendsLookup(context.Background(), uuid.UUID(player.ID()))
 				if err != nil {
 					player.SendMessage(&component.Text{
-						Content: "An error occured, please try again",
+						Content: config.ViperConfig.GetString("messages.errorOccured"),
 					})
 					log.Println(err)
 					return nil
@@ -118,7 +117,7 @@ func friendCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 				err = database.DB.CreateFriendRequest(context.Background(), createFriendRequestParams)
 				if err != nil {
 					player.SendMessage(&component.Text{
-						Content: "An error occured, please try again",
+						Content: config.ViperConfig.GetString("messages.errorOccured"),
 					})
 					log.Println(err)
 					return nil
@@ -138,22 +137,34 @@ func friendCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 					})
 				}
 			} else if strings.ToLower(arg1) == "remove" {
+				getFriendStatusParams := database.GetFriendStatusParams{
+					Uid1: uuid.UUID(player.ID()),
+					Uid2: targetUUID,
+				}
+				friendStatus, err := database.DB.GetFriendStatus(context.Background(), getFriendStatusParams)
+				if err != nil || friendStatus == database.FriendstatusPENDING {
+					player.SendMessage(&component.Text{
+						Content: config.ViperConfig.GetString("messages.errorNotInFriendList"),
+					})
+					return nil
+				}
 				// remove
 				removeFriendRequestParam := database.RemoveFriendRequestParams{
 					Uid1: uuid.UUID(player.ID()),
 					Uid2: targetUUID,
 				}
-				err := database.DB.RemoveFriendRequest(context.Background(), removeFriendRequestParam)
+				err = database.DB.RemoveFriendRequest(context.Background(), removeFriendRequestParam)
 				if err != nil {
 					player.SendMessage(&component.Text{
-						Content: "An error occured, please try again",
+						Content: config.ViperConfig.GetString("messages.errorOccured"),
 					})
 					log.Println(err)
 					return nil
 				}
-				// just send to the player
 				player.SendMessage(&component.Text{
-					Content: fmt.Sprintf("Removed %s", targetUsername),
+					Content: replaceAll(config.ViperConfig.GetString("messages.friendSucessfullyRemoved"), map[string]string{
+						"%friend%": targetUsername,
+					}),
 				})
 			} else if strings.ToLower(arg1) == "accept" {
 				// check if have relations
@@ -189,7 +200,7 @@ func friendCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 				err = database.DB.AcceptFriendRequest(context.Background(), acceptFriendRequetsParam)
 				if err != nil {
 					player.SendMessage(&component.Text{
-						Content: "An error occured, please try again",
+						Content: config.ViperConfig.GetString("messages.errorOccured"),
 					})
 					log.Println(err)
 					return nil
