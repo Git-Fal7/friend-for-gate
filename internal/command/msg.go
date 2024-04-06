@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/git-fal7/friend-for-gate/internal/config"
 	"github.com/git-fal7/friend-for-gate/internal/database"
@@ -21,7 +20,7 @@ func msgCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 				return nil
 			}
 			player.SendMessage(&component.Text{
-				Content: "/msg [player] [message]",
+				Content: config.ViperConfig.GetString("messages.msgHelpMessage"),
 			})
 			return nil
 		})).Then(brigodier.Argument("player", brigodier.String).
@@ -31,7 +30,7 @@ func msgCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 				return nil
 			}
 			player.SendMessage(&component.Text{
-				Content: "/msg [player] [message]",
+				Content: config.ViperConfig.GetString("messages.msgHelpMessage"),
 			})
 			return nil
 		})).Then(brigodier.Argument("message", brigodier.StringPhrase).
@@ -55,15 +54,24 @@ func msgCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 			friendStatus, err := database.DB.GetFriendStatus(context.Background(), getFriendStatusParams)
 			if err != nil || friendStatus != database.FriendstatusFRIEND {
 				player.SendMessage(&component.Text{
-					Content: "That player isn't in your friend list",
+					Content: config.ViperConfig.GetString("messages.errorNotInFriendList"),
 				})
 				return nil
 			}
+
 			player.SendMessage(&component.Text{
-				Content: fmt.Sprintf("%s >> %s: %s", player.Username(), target.Username(), message),
+				Content: replaceAll(config.ViperConfig.GetString("messages.msgOutgoingMessage"), map[string]string{
+					"%receiver%": player.Username(),
+					"%target%":   target.Username(),
+					"%message%":  message,
+				}),
 			})
 			target.SendMessage(&component.Text{
-				Content: fmt.Sprintf("%s >> %s: %s", player.Username(), target.Username(), message),
+				Content: replaceAll(config.ViperConfig.GetString("messages.msgIncomingMessage"), map[string]string{
+					"%receiver%": player.Username(),
+					"%target%":   target.Username(),
+					"%message%":  message,
+				}),
 			})
 			return nil
 		})),
