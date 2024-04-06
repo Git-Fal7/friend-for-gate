@@ -35,4 +35,5 @@ func InitConfig() {
 	ViperConfig.SetDefault("messages.errorNoRequest", "You dont have a request from this player")
 	ViperConfig.SetDefault("messages.errorNotInFriendList", "That player is not in your friend list")
 	ViperConfig.SetDefault("messages.errorOccured", "An error occured, please try again")
+	ViperConfig.SetDefault("messages.errorSelfAdd", "You cant add yourself")
 }

@@ -78,6 +78,12 @@ func friendCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 			}
 			if strings.ToLower(arg1) == "add" {
 				// check if have relations
+				if targetUUID == uuid.UUID(player.ID()) {
+					player.SendMessage(&component.Text{
+						Content: config.ViperConfig.GetString("messages.errorSelfAdd"),
+					})
+					return nil
+				}
 				getFriendStatusParams := database.GetFriendStatusParams{
 					Uid1: uuid.UUID(player.ID()),
 					Uid2: targetUUID,
