@@ -44,7 +44,7 @@ func InitConfig() {
 	if err != nil {
 		// Create config file
 		log.Println("Couldn't find friendforgate.yml, creating a new config file")
-		ViperConfig.WriteConfig()
+		ViperConfig.WriteConfigAs("./friendforgate.yml")
 	}
 
 }
