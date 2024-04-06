@@ -1,6 +1,10 @@
 package config
 
-import "github.com/spf13/viper"
+import (
+	"log"
+
+	"github.com/spf13/viper"
+)
 
 var ViperConfig = viper.New()
 
@@ -8,7 +12,6 @@ func InitConfig() {
 	ViperConfig.AddConfigPath(".")
 	ViperConfig.SetConfigName("friendforgate")
 	ViperConfig.SetConfigType("yaml")
-	ViperConfig.ReadInConfig()
 
 	ViperConfig.SetDefault("database.hostname", "localhost")
 	ViperConfig.SetDefault("database.port", 5432)
@@ -36,4 +39,12 @@ func InitConfig() {
 	ViperConfig.SetDefault("messages.errorNotInFriendList", "That player is not in your friend list")
 	ViperConfig.SetDefault("messages.errorOccured", "An error occured, please try again")
 	ViperConfig.SetDefault("messages.errorSelfAdd", "You cant add yourself")
+
+	err := ViperConfig.ReadInConfig()
+	if err != nil {
+		// Create config file
+		log.Println("Couldn't find friendforgate.yml, creating a new config file")
+		ViperConfig.WriteConfig()
+	}
+
 }
