@@ -14,13 +14,6 @@ import (
 	"go.minekube.com/gate/pkg/edition/java/proxy"
 )
 
-func replaceAll(str string, replaceMap map[string]string) string {
-	for key, value := range replaceMap {
-		str = strings.ReplaceAll(str, key, value)
-	}
-	return str
-}
-
 func friendCommand(p *proxy.Proxy) brigodier.LiteralNodeBuilder {
 	return brigodier.Literal("friend").
 		Executes(command.Command(func(c *command.Context) error {
